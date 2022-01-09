@@ -234,30 +234,31 @@ class FMCMainDisplay extends BaseAirliners {
         this.cruiseFlightLevel /= 100;
         this._cruiseFlightLevel = this.cruiseFlightLevel;
 
-        this.flightPlanManager.onCurrentGameFlightLoaded(() => {
-            this.flightPlanManager.updateFlightPlan(() => {
-                this.flightPlanManager.updateCurrentApproach();
-                const callback = () => {
-                    this.flightPlanManager.createNewFlightPlan();
-                    SimVar.SetSimVarValue("L:FLIGHTPLAN_USE_DECEL_WAYPOINT", "number", 1);
-                    SimVar.SetSimVarValue("L:AIRLINER_V1_SPEED", "Knots", NaN);
-                    SimVar.SetSimVarValue("L:AIRLINER_V2_SPEED", "Knots", NaN);
-                    SimVar.SetSimVarValue("L:AIRLINER_VR_SPEED", "Knots", NaN);
-                    const cruiseAlt = Math.floor(this.flightPlanManager.cruisingAltitude / 100);
-                    console.log("FlightPlan Cruise Override. Cruising at FL" + cruiseAlt + " instead of default FL" + this.cruiseFlightLevel);
-                    if (cruiseAlt > 0) {
-                        this.cruiseFlightLevel = cruiseAlt;
-                        this._cruiseFlightLevel = cruiseAlt;
-                    }
-                };
-                const arrivalIndex = this.flightPlanManager.getArrivalProcIndex();
-                if (arrivalIndex >= 0) {
-                    this.flightPlanManager.setArrivalProcIndex(arrivalIndex, callback).catch(console.error);
-                } else {
-                    callback();
-                }
-            });
-        });
+        // TODO port over somehow ?
+        // this.flightPlanManager.onCurrentGameFlightLoaded(() => {
+        //     this.flightPlanManager.updateFlightPlan(() => {
+        //         this.flightPlanManager.updateCurrentApproach();
+        //         const callback = () => {
+        //             this.flightPlanManager.createNewFlightPlan();
+        //             SimVar.SetSimVarValue("L:FLIGHTPLAN_USE_DECEL_WAYPOINT", "number", 1);
+        //             SimVar.SetSimVarValue("L:AIRLINER_V1_SPEED", "Knots", NaN);
+        //             SimVar.SetSimVarValue("L:AIRLINER_V2_SPEED", "Knots", NaN);
+        //             SimVar.SetSimVarValue("L:AIRLINER_VR_SPEED", "Knots", NaN);
+        //             const cruiseAlt = Math.floor(this.flightPlanManager.cruisingAltitude / 100);
+        //             console.log("FlightPlan Cruise Override. Cruising at FL" + cruiseAlt + " instead of default FL" + this.cruiseFlightLevel);
+        //             if (cruiseAlt > 0) {
+        //                 this.cruiseFlightLevel = cruiseAlt;
+        //                 this._cruiseFlightLevel = cruiseAlt;
+        //             }
+        //         };
+        //         const arrivalIndex = this.flightPlanManager.getArrivalProcIndex();
+        //         if (arrivalIndex >= 0) {
+        //             this.flightPlanManager.setArrivalProcIndex(arrivalIndex, callback).catch(console.error);
+        //         } else {
+        //             callback();
+        //         }
+        //     });
+        // });
 
         this.updateFuelVars();
         this.updatePerfSpeeds();
@@ -269,8 +270,9 @@ class FMCMainDisplay extends BaseAirliners {
 
         /** It takes some time until origin and destination are known, placing this inside callback of the flight plan loader doesn't work */
         setTimeout(() => {
-            const origin = this.flightPlanManager.getOrigin();
-            const dest = this.flightPlanManager.getDestination();
+            const origin = this.flightPlanService.active.originAirport;
+            const dest = this.flightPlanService.active.destinationAirport;
+
             if (origin && origin.ident && dest && dest.ident) {
                 this.aocAirportList.init(origin.ident, dest.ident);
             }
@@ -570,6 +572,7 @@ class FMCMainDisplay extends BaseAirliners {
 
         this.A32NXCore.update();
 
+        // TODO fix
         this.updateAutopilot();
 
         if (this._progBrgDistUpdateThrottler.canUpdate(_deltaTime) !== -1) {
@@ -766,6 +769,9 @@ class FMCMainDisplay extends BaseAirliners {
     }
 
     updateHoldingSpeed() {
+        // TODO port over
+        return;
+
         const currentLeg = this.flightPlanManager.getActiveWaypoint();
         const nextLeg = this.flightPlanManager.getWaypoint(this.flightPlanManager.getActiveWaypointIndex() + 1);
 
@@ -1087,7 +1093,7 @@ class FMCMainDisplay extends BaseAirliners {
                 console.log("Enforce AP in Altitude Lock mode. Cause : AP Master Status has changed.");
                 SimVar.SetSimVarValue("L:A320_NEO_FCU_FORCE_IDLE_VS", "Number", 1);
                 if (this._apMasterStatus) {
-                    if (this.flightPlanManager.getWaypointsCount() === 0) {
+                    if (this.flightPlanService.hasActive && this.flightPlanService.active.legCount === 0) {
                         this._onModeSelectedAltitude();
                         this._onModeSelectedHeading();
                     }
@@ -1104,43 +1110,40 @@ class FMCMainDisplay extends BaseAirliners {
                 }
             }
 
-            if (this.isAltitudeManaged()) {
-                const prevWaypoint = this.flightPlanManager.getPreviousActiveWaypoint();
-                const nextWaypoint = this.flightPlanManager.getActiveWaypoint();
+            // TODO port constraints over
+            // if (this.isAltitudeManaged()) {
+            //     const prevWaypoint = this.flightPlanManager.getPreviousActiveWaypoint();
+            //     const nextWaypoint = this.flightPlanManager.getActiveWaypoint();
+            //
+            //     if (prevWaypoint && nextWaypoint) {
+            //         const activeWpIdx = this.flightPlanManager.getActiveWaypointIndex();
+            //
+            //         if (activeWpIdx !== this.activeWpIdx) {
+            //             this.activeWpIdx = activeWpIdx;
+            //             this.updateConstraints();
+            //         }
+            //         if (this.constraintAlt) {
+            //             Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, this.constraintAlt, this._forceNextAltitudeUpdate).catch(console.error);
+            //             this._forceNextAltitudeUpdate = false;
+            //         } else {
+            //             const altitude = Simplane.getAutoPilotSelectedAltitudeLockValue("feet");
+            //             if (isFinite(altitude)) {
+            //                 Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, altitude, this._forceNextAltitudeUpdate).catch(console.error);
+            //                 this._forceNextAltitudeUpdate = false;
+            //             }
+            //         }
+            //     } else {
+            //         const altitude = Simplane.getAutoPilotSelectedAltitudeLockValue("feet");
+            //         if (isFinite(altitude)) {
+            //             SimVar.SetSimVarValue("L:A32NX_FG_ALTITUDE_CONSTRAINT", "feet", 0);
+            //             Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, altitude, this._forceNextAltitudeUpdate).catch(console.error);
+            //             this._forceNextAltitudeUpdate = false;
+            //         }
+            //     }
+            // }
 
-                if (prevWaypoint && nextWaypoint) {
-                    const activeWpIdx = this.flightPlanManager.getActiveWaypointIndex();
-
-                    if (activeWpIdx !== this.activeWpIdx) {
-                        this.activeWpIdx = activeWpIdx;
-                        this.updateConstraints();
-                    }
-                    if (this.constraintAlt) {
-                        Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, this.constraintAlt, this._forceNextAltitudeUpdate).catch(console.error);
-                        this._forceNextAltitudeUpdate = false;
-                    } else {
-                        const altitude = Simplane.getAutoPilotSelectedAltitudeLockValue("feet");
-                        if (isFinite(altitude)) {
-                            Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, altitude, this._forceNextAltitudeUpdate).catch(console.error);
-                            this._forceNextAltitudeUpdate = false;
-                        }
-                    }
-                } else {
-                    const altitude = Simplane.getAutoPilotSelectedAltitudeLockValue("feet");
-                    if (isFinite(altitude)) {
-                        SimVar.SetSimVarValue("L:A32NX_FG_ALTITUDE_CONSTRAINT", "feet", 0);
-                        Coherent.call("AP_ALT_VAR_SET_ENGLISH", 2, altitude, this._forceNextAltitudeUpdate).catch(console.error);
-                        this._forceNextAltitudeUpdate = false;
-                    }
-                }
-            }
-            if (this.flightPlanManager.isLoadedApproach() && !this.flightPlanManager.isActiveApproach() && (this.flightPlanManager.getActiveWaypointIndex() === -1 || (this.flightPlanManager.getActiveWaypointIndex() > this.flightPlanManager.getLastIndexBeforeApproach()))) {
-                if (SimVar.GetSimVarValue("L:FMC_FLIGHT_PLAN_IS_TEMPORARY", "number") !== 1) {
-                    this.flightPlanManager.tryAutoActivateApproach();
-                }
-            }
-            if (Simplane.getAutoPilotAltitudeManaged() && SimVar.GetSimVarValue("L:A320_NEO_FCU_STATE", "number") !== 1) {
-                const currentWaypointIndex = this.flightPlanManager.getActiveWaypointIndex();
+            if (Simplane.getAutoPilotAltitudeManaged() && this.flightPlanService.hasActive && SimVar.GetSimVarValue("L:A320_NEO_FCU_STATE", "number") !== 1) {
+                const currentWaypointIndex = this.flightPlanService.active.activeLegIndex;
                 if (currentWaypointIndex !== this._lastRequestedFLCModeWaypointIndex) {
                     this._lastRequestedFLCModeWaypointIndex = currentWaypointIndex;
                     setTimeout(() => {
@@ -1525,6 +1528,10 @@ class FMCMainDisplay extends BaseAirliners {
         return false;
     }
 
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: Start of functions to refactor
+    //-----------------------------------------------------------------------------------
+
     ensureCurrentFlightPlanIsTemporary(callback = EmptyCallback.Boolean) {
         if (this.flightPlanManager.getCurrentFlightPlanIndex() === 0) {
             this.flightPlanManager.copyCurrentFlightPlanInto(1, () => {
@@ -1546,36 +1553,46 @@ class FMCMainDisplay extends BaseAirliners {
         }
         const from = fromTo.split("/")[0];
         const to = fromTo.split("/")[1];
-        this.dataManager.GetAirportByIdent(from).then((airportFrom) => {
-            if (airportFrom) {
-                this.dataManager.GetAirportByIdent(to).then((airportTo) => {
-                    if (airportTo) {
-                        this.eraseTemporaryFlightPlan(() => {
-                            this.flightPlanManager.clearFlightPlan(() => {
-                                this.tempFpPendingAutoTune = true;
-                                this.flightPlanManager.setOrigin(airportFrom.icao, () => {
-                                    this.tmpOrigin = airportFrom.ident;
-                                    this.flightPlanManager.setDestination(airportTo.icao, () => {
-                                        this.flightPlanManager.getWaypoint(0).endsInDiscontinuity = true;
-                                        this.flightPlanManager.getWaypoint(0).discontinuityCanBeCleared = true;
-                                        this.aocAirportList.init(this.tmpOrigin, airportTo.ident);
-                                        this.tmpOrigin = airportTo.ident;
-                                        SimVar.SetSimVarValue("L:FLIGHTPLAN_USE_DECEL_WAYPOINT", "number", 1);
-                                        callback(true);
-                                    }).catch(console.error);
-                                }).catch(console.error);
-                            }).catch(console.error);
-                        });
-                    } else {
-                        this.addNewMessage(NXSystemMessages.notInDatabase);
-                        callback(false);
-                    }
-                }).catch(console.error);
-            } else {
-                this.addNewMessage(NXSystemMessages.notInDatabase);
-                callback(false);
-            }
-        }).catch(console.error);
+
+        this.flightPlanService.newCityPair(from, to).then(() => {
+            callback(true);
+        }).catch((e) => {
+            console.log('[FMS] Error while setting city pair. See exception below.');
+            console.log(e);
+
+            this.addNewMessage(NXSystemMessages.notInDatabase);
+            callback(false);
+        });
+        // this.dataManager.GetAirportByIdent(from).then((airportFrom) => {
+        //     if (airportFrom) {
+        //         this.dataManager.GetAirportByIdent(to).then((airportTo) => {
+        //             if (airportTo) {
+        //                 this.eraseTemporaryFlightPlan(() => {
+        //                     this.flightPlanManager.clearFlightPlan(() => {
+        //                         this.tempFpPendingAutoTune = true;
+        //                         this.flightPlanManager.setOrigin(airportFrom.icao, () => {
+        //                             this.tmpOrigin = airportFrom.ident;
+        //                             this.flightPlanManager.setDestination(airportTo.icao, () => {
+        //                                 this.flightPlanManager.getWaypoint(0).endsInDiscontinuity = true;
+        //                                 this.flightPlanManager.getWaypoint(0).discontinuityCanBeCleared = true;
+        //                                 this.aocAirportList.init(this.tmpOrigin, airportTo.ident);
+        //                                 this.tmpOrigin = airportTo.ident;
+        //                                 SimVar.SetSimVarValue("L:FLIGHTPLAN_USE_DECEL_WAYPOINT", "number", 1);
+        //                                 callback(true);
+        //                             }).catch(console.error);
+        //                         }).catch(console.error);
+        //                     }).catch(console.error);
+        //                 });
+        //             } else {
+        //                 this.addNewMessage(NXSystemMessages.notInDatabase);
+        //                 callback(false);
+        //             }
+        //         }).catch(console.error);
+        //     } else {
+        //         this.addNewMessage(NXSystemMessages.notInDatabase);
+        //         callback(false);
+        //     }
+        // }).catch(console.error);
     }
 
     /**
@@ -1586,6 +1603,10 @@ class FMCMainDisplay extends BaseAirliners {
             this.flightPlanManager.getDestination().infos.coordinates,
             this.altDestination.infos.coordinates);
     }
+
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: End of functions to refactor
+    //-----------------------------------------------------------------------------------
 
     // only used by trySetRouteAlternateFuel
     isAltFuelInRange(fuel) {
@@ -1774,15 +1795,12 @@ class FMCMainDisplay extends BaseAirliners {
         return this._routeAltFuelTime;
     }
 
-    setOriginRunwayIndex(runwayIndex, callback = EmptyCallback.Boolean) {
-        this.ensureCurrentFlightPlanIsTemporary(() => {
-            this.tempFpPendingAutoTune = true;
-            this.flightPlanManager.setDepartureProcIndex(-1, () => {
-                this.flightPlanManager.setOriginRunwayIndex(runwayIndex, () => {
-                    return callback(true);
-                }).catch(console.error);
-            }).catch(console.error);
-        });
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: Start of functions to refactor
+    //-----------------------------------------------------------------------------------
+
+    async setOriginRunwayIndex(runwayIdent) {
+        await this.flightPlanService.setOriginRunway(runwayIdent);
     }
 
     setRunwayIndex(runwayIndex, callback = EmptyCallback.Boolean) {
@@ -1880,6 +1898,10 @@ class FMCMainDisplay extends BaseAirliners {
             }).catch(console.error);
         });
     }
+
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: End of functions to refactor
+    //-----------------------------------------------------------------------------------
 
     async tuneIlsFromApproach(appr) {
         const finalLeg = appr.finalLegs[appr.finalLegs.length - 1];
@@ -2077,6 +2099,10 @@ class FMCMainDisplay extends BaseAirliners {
         return this._routeTripFuelWeight;
     }
 
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: Start of functions to refactor
+    //-----------------------------------------------------------------------------------
+
     _getOrSelectWaypoints(getter, ident, callback) {
         getter(ident).then((waypoints) => {
             if (waypoints.length === 0) {
@@ -2100,7 +2126,7 @@ class FMCMainDisplay extends BaseAirliners {
     }
 
     getOrSelectWaypointByIdent(ident, callback) {
-        this._getOrSelectWaypoints(this.dataManager.GetWaypointsByIdent.bind(this.dataManager), ident, callback);
+        this._getOrSelectWaypoints(this.navigationDatabase.searchFix.bind(this.navigationDatabase), ident, callback);
     }
 
     insertWaypoint(newWaypointTo, index, callback = EmptyCallback.Boolean, immediately) {
@@ -2108,38 +2134,37 @@ class FMCMainDisplay extends BaseAirliners {
             return callback(false);
         }
         try {
-            this.getOrCreateWaypoint(newWaypointTo, true).then((waypoint) => {
-                if (!waypoint) {
-                    return callback(false);
-                }
-                if (immediately) {
-                    if (this.flightPlanManager.isCurrentFlightPlanTemporary()) {
-                        this.addNewMessage(NXSystemMessages.notAllowed);
+            this.getOrCreateWaypoint(newWaypointTo, true).then(
+                /**
+                 * @param {Waypoint} waypoint
+                 */
+                (waypoint) => {
+                    if (!waypoint) {
                         return callback(false);
                     }
-                    if (waypoint.additionalData && waypoint.additionalData.storedType !== undefined) {
-                        this.flightPlanManager.addUserWaypoint(waypoint, index, () => {
-                            return callback(true);
-                        }).catch(console.error);
-                    } else {
-                        this.flightPlanManager.addWaypoint(waypoint.icao, index, () => {
-                            return callback(true);
-                        }).catch(console.error);
-                    }
-                } else {
-                    this.ensureCurrentFlightPlanIsTemporary(async () => {
-                        if (waypoint.additionalData && waypoint.additionalData.storedType !== undefined) {
-                            this.flightPlanManager.addUserWaypoint(waypoint, index, () => {
-                                return callback(true);
-                            }).catch(console.error);
-                        } else {
-                            this.flightPlanManager.addWaypoint(waypoint.icao, index, () => {
-                                return callback(true);
-                            }).catch(console.error);
+                    if (immediately) {
+                        if (this.flightPlanService.hasTemporary) {
+                            this.addNewMessage(NXSystemMessages.notAllowed);
+                            return callback(false);
                         }
-                    });
-                }
-            }).catch((err) => {
+
+                        this.flightPlanService.nextWaypoint(index, waypoint);
+
+                        return callback(true);
+                    } else {
+                        this.ensureCurrentFlightPlanIsTemporary(async () => {
+                            if (waypoint.additionalData && waypoint.additionalData.storedType !== undefined) {
+                                this.flightPlanManager.addUserWaypoint(waypoint, index, () => {
+                                    return callback(true);
+                                }).catch(console.error);
+                            } else {
+                                this.flightPlanManager.addWaypoint(waypoint.icao, index, () => {
+                                    return callback(true);
+                                }).catch(console.error);
+                            }
+                        });
+                    }
+                }).catch((err) => {
                 if (err instanceof McduMessage) {
                     this.addNewMessage(err);
                 } else {
@@ -2327,21 +2352,9 @@ class FMCMainDisplay extends BaseAirliners {
         });
     }
 
-    insertTemporaryFlightPlan(callback = EmptyCallback.Void) {
-        if (this.flightPlanManager.getCurrentFlightPlanIndex() === 1) {
-            this.flightPlanManager.copyCurrentFlightPlanInto(0, () => {
-                this.flightPlanManager.setCurrentFlightPlanIndex(0, () => {
-                    SimVar.SetSimVarValue("L:FMC_FLIGHT_PLAN_IS_TEMPORARY", "number", 0);
-                    SimVar.SetSimVarValue("L:MAP_SHOW_TEMPORARY_FLIGHT_PLAN", "number", 0);
-                    if (this.tempFpPendingAutoTune) {
-                        this.clearAutotunedIls();
-                        this.tempFpPendingAutoTune = false;
-                    }
-                    callback();
-                });
-            }).catch(console.error);
-        }
-    }
+    //-----------------------------------------------------------------------------------
+    // TODO:FPM REWRITE: End of functions to refactor
+    //-----------------------------------------------------------------------------------
 
     vSpeedsValid() {
         return this._v1Checked && this._vRChecked && this._v2Checked ? (
@@ -3869,9 +3882,11 @@ class FMCMainDisplay extends BaseAirliners {
      *   Only prompt the confirmation of FLEX TEMP when the TO runway was changed, not on initial insertion of the runway
      */
     onToRwyChanged() {
-        const selectedRunway = this.flightPlanManager.getOriginRunway();
+        const activePlan = this.flightPlanService.active;
+        const selectedRunway = activePlan.originRunway;
+
         if (!!selectedRunway) {
-            const toRunway = Avionics.Utils.formatRunway(selectedRunway.designation);
+            const toRunway = Avionics.Utils.formatRunway(selectedRunway.ident);
             if (toRunway === this.toRunway) {
                 return;
             }

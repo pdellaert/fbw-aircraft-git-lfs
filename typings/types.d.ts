@@ -1,3 +1,7 @@
+import { FlightPlanService as Service } from "../src/fmgc/src";
+import { NavigationDatabase as Database, NavigationDatabaseBackend as DatabaseBackend } from '../src/fmgc/src/NavigationDatabase'
+import { FlightPlanIndex as Index } from '../src/fmgc/src';
+
 declare global {
     type NauticalMiles = number;
     type Heading = number;
@@ -26,6 +30,16 @@ declare global {
     type InchesOfMercury = number;
     type Millibar = number;
     type PressurePerSquareInch = number;
+
+    namespace Fmgc {
+        const FlightPlanService: typeof Service
+
+        const NavigationDatabase: typeof Database
+
+        const NavigationDatabaseBackend: typeof DatabaseBackend
+
+        const FlightPlanIndex: typeof Index
+    }
 }
 
 export {};

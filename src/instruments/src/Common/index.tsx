@@ -7,6 +7,8 @@ import { SimVarProvider } from './simVars';
  * Use the given React element to render the instrument using React.
  */
 export const render = (Slot: React.ReactElement) => {
+    // here
+
     ReactDOM.render(<SimVarProvider>{Slot}</SimVarProvider>, Defaults.getRenderTarget());
 };
 

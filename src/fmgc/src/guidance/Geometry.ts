@@ -21,23 +21,26 @@ import { isCourseReversalLeg } from '@fmgc/guidance/lnav/legs';
 import { ControlLaw, GuidanceParameters, LateralPathGuidance } from './ControlLaws';
 
 export class Geometry {
-    /**
-     * The list of transitions between legs.
-     * - entry n: transition after leg n
-     */
-    transitions: Map<number, Transition>;
-
-    /**
-     * The list of legs in this geometry, possibly connected through transitions:
-     * - entry n: nth leg, before transition n
-     */
-    legs: Map<number, Leg>;
-
     public version = 0;
 
-    private listener = RegisterViewListener('JS_LISTENER_SIMVARS');
+    constructor(
+        /**
+         * The list of transitions between legs.
+         * - entry n: transition after leg n
+         */
+        public transitions: Map<number, Transition>,
 
-    constructor(transitions: Map<number, Transition>, legs: Map<number, Leg>) {
+        /**
+         * The list of legs in this geometry, possibly connected through transitions:
+         * - entry n: nth leg, before transition n
+         */
+        public legs: Map<number, Leg>,
+
+        /**
+         * A ViewListener for `JS_LISTENER_SIMVARS`
+         */
+        public listener: ViewListener.ViewListener,
+    ) {
         this.transitions = transitions;
         this.legs = legs;
     }
@@ -46,16 +49,28 @@ export class Geometry {
 
     private cachedVectors = [];
 
+    private missedCachedVectors = [];
+
     public cachedVectorsVersion = 0;
 
-    public getAllPathVectors(activeLegIndex?: number): PathVector[] {
-        if (this.version === this.cachedVectorsVersion) {
+    public missedCachedVectorsVersion = 0;
+
+    public getAllPathVectors(activeLegIndex?: number, missedApproach = false): PathVector[] {
+        if (missedApproach) {
+            if (this.version === this.missedCachedVectorsVersion) {
+                return this.missedCachedVectors;
+            }
+        } else if (this.version === this.cachedVectorsVersion) {
             return this.cachedVectors;
         }
 
         const ret = [];
 
         for (const [index, leg] of this.legs.entries()) {
+            if ((!missedApproach && leg.metadata.isInMissedApproach) || (missedApproach && !leg.metadata.isInMissedApproach)) {
+                continue;
+            }
+
             if (activeLegIndex !== undefined) {
                 if (!LnavConfig.DEBUG_FORCE_INCLUDE_COURSE_REVERSAL_VECTORS && isCourseReversalLeg(leg) && index !== activeLegIndex && index !== (activeLegIndex + 1)) {
                     continue;
@@ -71,8 +86,13 @@ export class Geometry {
             ret.push(...leg.predictedPath);
         }
 
-        this.cachedVectors = ret;
-        this.cachedVectorsVersion = this.version;
+        if (missedApproach) {
+            this.missedCachedVectors = ret;
+            this.missedCachedVectorsVersion = this.version;
+        } else {
+            this.cachedVectors = ret;
+            this.cachedVectorsVersion = this.version;
+        }
 
         return ret;
     }
@@ -170,10 +190,11 @@ export class Geometry {
         }
     }
 
-    static getLegPredictedTas(leg: Leg) {
-        if (leg instanceof TFLeg) {
-            return leg.to?.additionalData?.predictedSpeed;
-        }
+    static getLegPredictedTas(_leg: Leg) {
+        // TODO port over
+        // if (leg instanceof TFLeg) {
+        //     return leg.to?.additionalData?.predictedSpeed;
+        // }
 
         return undefined;
     }
