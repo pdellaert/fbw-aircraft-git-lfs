@@ -14,8 +14,7 @@ export default new TaskOfTasks('all', [
         // Group all WASM build tasks together but separate from the rest of the tasks as build run more stable like this.
         new TaskOfTasks('wasm', [
             new ExecTask('systems', [
-                'npm run build-a32nx:systems',
-                'wasm-opt -O1 -o fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/systems.wasm target/wasm32-wasi/release/a320_systems_wasm.wasm',
+                'npm run build-a32nx:systems'
             ], [
                 'fbw-a32nx/src/wasm/systems',
                 'fbw-common/src/wasm/systems',
@@ -23,25 +22,22 @@ export default new TaskOfTasks('all', [
                 'Cargo.toml',
                 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/systems.wasm'
             ]),
-            new ExecTask('systems-fbw', [
-                'npm run build-a32nx:fbw',
-                'wasm-opt -O1 -o fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fbw.wasm fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fbw.wasm'
-            ], [
-                'fbw-a32nx/src/wasm/fbw_a320',
-                'fbw-common/src/wasm/fbw_common',
-                'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fbw.wasm'
-            ]),
             new ExecTask('systems-fadec', [
-                'npm run build-a32nx:fadec',
-                'wasm-opt -O1 -o fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fadec.wasm fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fadec.wasm'
+                'npm run build-a32nx:fadec'
             ], [
                 'fbw-a32nx/src/wasm/fadec_a320',
                 'fbw-common/src/wasm/fbw_common',
                 'fbw-common/src/wasm/fadec_common',
                 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fadec.wasm']),
+            new ExecTask('systems-fbw', [
+                'npm run build-a32nx:fbw'
+            ], [
+                'fbw-a32nx/src/wasm/fbw_a320',
+                'fbw-common/src/wasm/fbw_common',
+                'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/fbw.wasm'
+            ]),
             new ExecTask('flypad-backend', [
-                'npm run build-a32nx:flypad-backend',
-                'wasm-opt -O1 -o fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/flypad-backend.wasm fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/flypad-backend.wasm'
+                'npm run build-a32nx:flypad-backend'
             ], [
                 'fbw-a32nx/src/wasm/flypad-backend',
                 'fbw-common/src/wasm/fbw_common',
@@ -54,12 +50,10 @@ export default new TaskOfTasks('all', [
             new ExecTask('behavior', 'npm run build-a32nx:behavior', ['fbw-a32nx/src/behavior', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/ModelBehaviorDefs/A32NX/generated']),
 
             new ExecTask('atsu','npm run build-a32nx:atsu', ['fbw-a32nx/src/systems/atsu', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/atsu']),
-            // TODO: Change out folder name - double check
             new ExecTask('failures','npm run build-a32nx:failures', ['fbw-a32nx/src/systems/failures', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/failures/failures.js']),
             new ExecTask('fmgc','npm run build-a32nx:fmgc', ['fbw-a32nx/src/systems/fmgc', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/fmgc']),
             new ExecTask('sentry-client','npm run build-a32nx:sentry-client', ['fbw-a32nx/src/systems/sentry-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/sentry-client']),
             new ExecTask('simbridge-client', ['npm run build-a32nx:simbridge-client'], ['fbw-a32nx/src/systems/simbridge-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/simbridge-client']),
-            // TODO: this was missing before - added it but might have had a reason it was missong
             new ExecTask('tcas','npm run build-a32nx:tcas', ['fbw-a32nx/src/systems/tcas', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/tcas']),
 
             new TaskOfTasks('instruments',
@@ -72,8 +66,8 @@ export default new TaskOfTasks('all', [
 
         // Create final package meta files.
         new TaskOfTasks('dist', [
-            new ExecTask('metadata', 'node scripts/metadata.js fbw-a32nx/out/flybywire-aircraft-a320-neo a32nx'),
-            new ExecTask('manifests', 'node scripts/build_a32nx.js'),
+            new ExecTask('metadata', 'npm run build-a32nx:metadata'),
+            new ExecTask('manifests', 'npm run build-a32nx:manifest'),
         ]),
     ]),
 
@@ -90,8 +84,7 @@ export default new TaskOfTasks('all', [
 
         new TaskOfTasks('wasm', [
             new ExecTask('systems', [
-                'npm run build-a380x:systems',
-                'wasm-opt -O1 -o fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/systems.wasm target/wasm32-wasi/release/a380_systems_wasm.wasm',
+                'npm run build-a380x:systems'
             ], [
                 'fbw-a380x/src/wasm/systems',
                 'fbw-common/src/wasm/systems',
@@ -100,24 +93,21 @@ export default new TaskOfTasks('all', [
                 'fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/systems.wasm'
             ]),
             new ExecTask('systems-fadec', [
-                'npm run build-a380x:fadec',
-                'wasm-opt -O1 -o fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fadec.wasm fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fadec.wasm'
+                'npm run build-a380x:fadec'
             ], [
                 'fbw-a380x/src/wasm/fadec_a320',
                 'fbw-common/src/wasm/fbw_common',
                 'fbw-common/src/wasm/fadec_common',
                 'fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fadec.wasm']),
             new ExecTask('systems-fbw', [
-                'npm run build-a380x:fbw',
-                'wasm-opt -O1 -o fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fbw.wasm fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fbw.wasm'
+                'npm run build-a380x:fbw'
             ], [
                 'fbw-a380x/src/wasm/fbw_a320',
                 'fbw-common/src/wasm/fbw_common',
                 'fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/fbw.wasm'
             ]),
             new ExecTask('flypad-backend', [
-                'npm run build-a380x:flypad-backend',
-                'wasm-opt -O1 -o fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/flypad-backend.wasm fbw-a380x/out/flybywire-aircraft-a380-841/SimObjects/AirPlanes/FlyByWire_A380_841/panel/flypad-backend.wasm'
+                'npm run build-a380x:flypad-backend'
             ], [
                 'fbw-a380x/src/wasm/flypad-backend',
                 'fbw-common/src/wasm/fbw_common',
