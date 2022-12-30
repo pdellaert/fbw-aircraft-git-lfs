@@ -53,14 +53,14 @@ export default new TaskOfTasks('all', [
             new ExecTask('model', 'npm run build-a32nx:model',['fbw-a32nx/src/model', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/model']),
             new ExecTask('behavior', 'npm run build-a32nx:behavior', ['fbw-a32nx/src/behavior', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/ModelBehaviorDefs/A32NX/generated']),
 
-            new ExecTask('atsu','npm run build-a32nx:atsu', ['fbw-a32nx/src/atsu', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/atsu']),
+            new ExecTask('atsu','npm run build-a32nx:atsu', ['fbw-a32nx/src/systems/atsu', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/atsu']),
             // TODO: Change out folder name - double check
-            new ExecTask('failures','npm run build-a32nx:failures', ['fbw-a32nx/src/failures', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/failures/failures.js']),
-            new ExecTask('fmgc','npm run build-a32nx:fmgc', ['fbw-a32nx/src/fmgc', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/fmgc']),
-            new ExecTask('sentry-client','npm run build-a32nx:sentry-client', ['fbw-a32nx/src/sentry-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/sentry-client']),
-            new ExecTask('simbridge-client', ['npm run build-a32nx:simbridge-client'], ['fbw-a32nx/src/simbridge-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/simbridge-client']),
+            new ExecTask('failures','npm run build-a32nx:failures', ['fbw-a32nx/src/systems/failures', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/failures/failures.js']),
+            new ExecTask('fmgc','npm run build-a32nx:fmgc', ['fbw-a32nx/src/systems/fmgc', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/fmgc']),
+            new ExecTask('sentry-client','npm run build-a32nx:sentry-client', ['fbw-a32nx/src/systems/sentry-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/sentry-client']),
+            new ExecTask('simbridge-client', ['npm run build-a32nx:simbridge-client'], ['fbw-a32nx/src/systems/simbridge-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/simbridge-client']),
             // TODO: this was missing before - added it but might have had a reason it was missong
-            new ExecTask('tcas','npm run build-a32nx:tcas', ['fbw-a32nx/src/tcas', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/tcas']),
+            new ExecTask('tcas','npm run build-a32nx:tcas', ['fbw-a32nx/src/systems/tcas', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/tcas']),
 
             new TaskOfTasks('instruments',
                 [
