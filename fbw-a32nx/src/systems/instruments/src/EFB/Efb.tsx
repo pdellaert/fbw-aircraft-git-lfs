@@ -320,7 +320,7 @@ const Efb = () => {
     switch (powerState) {
     case PowerStates.SHUTOFF:
     case PowerStates.STANDBY:
-        return <div className="w-screen h-screen" onClick={offToLoaded} >OFF</div>;
+        return <div className="w-screen h-screen" onClick={offToLoaded} />;
     case PowerStates.LOADING:
         return <LoadingScreen />;
     case PowerStates.EMPTY:
