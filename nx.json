@@ -1,0 +1,31 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build-a32nx:copy-base-files",
+          "build-a32nx:model",
+          "build-a32nx:behavior",
+          "build-a32nx:atsu",
+          "build-a32nx:failures",
+          "build-a32nx:fmgc",
+          "build-a32nx:sentry-client",
+          "build-a32nx:simbridge-client",
+          "build-a32nx:tcas",
+          "build-a32nx:pfd",
+          "build-a32nx:systems",
+          "build-a32nx:fadec",
+          "build-a32nx:fbw",
+          "build-a32nx:flypad-backend",
+          "build-a380x:copy-base-files",
+          "build-a380x:systems",
+          "build-a380x:fadec",
+          "build-a380x:fbw",
+          "build-a380x:flypad-backend"
+        ]
+      }
+    }
+  },
+  "defaultBase": "master"
+}

@@ -17,19 +17,20 @@
 !.prettierignore
 !.prettierrc.json
 
+!package.json
 !igniter.config.mjs
 !jsconfig.json
+!/nx.json
 
 !Cargo.lock
 !Cargo.toml
 !/.cargo/config.toml
 !rust-toolchain.toml
 
-!manifest-base.json
-!package.json
-
 !jest.config.js
 !/jest/**
+
+!manifest-base.json
 
 # Project folders
 
