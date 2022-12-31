@@ -11,6 +11,26 @@ export default new TaskOfTasks('all', [
             new ExecTask('efb-translation', 'npm run build-a32nx:efb-translation'),
         ], true),
 
+        // Group all typescript and react build tasks together.
+        new TaskOfTasks('build', [
+            new ExecTask('model', 'npm run build-a32nx:model',['fbw-a32nx/src/model', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/model']),
+            new ExecTask('behavior', 'npm run build-a32nx:behavior', ['fbw-a32nx/src/behavior', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/ModelBehaviorDefs/A32NX/generated']),
+
+            new ExecTask('atsu','npm run build-a32nx:atsu', ['fbw-a32nx/src/systems/atsu', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/atsu']),
+            new ExecTask('failures','npm run build-a32nx:failures', ['fbw-a32nx/src/systems/failures', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/failures/failures.js']),
+            new ExecTask('fmgc','npm run build-a32nx:fmgc', ['fbw-a32nx/src/systems/fmgc', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/fmgc']),
+            new ExecTask('sentry-client','npm run build-a32nx:sentry-client', ['fbw-a32nx/src/systems/sentry-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/sentry-client']),
+            new ExecTask('simbridge-client', ['npm run build-a32nx:simbridge-client'], ['fbw-a32nx/src/systems/simbridge-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/simbridge-client']),
+            new ExecTask('tcas','npm run build-a32nx:tcas', ['fbw-a32nx/src/systems/tcas', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/tcas']),
+
+            new TaskOfTasks('instruments',
+                [
+                    ...getA32NXInstrumentsIgniterTasks(),
+                    new ExecTask('PFD', 'npm run build-a32nx:pfd', ['fbw-a32nx/src/systems/instruments/src/PFD','fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/Pages/VCockpit/Instruments/A32NX/PFD'])
+                ],
+                true),
+        ], true),
+
         // Group all WASM build tasks together but separate from the rest of the tasks as build run more stable like this.
         new TaskOfTasks('wasm', [
             new ExecTask('systems', [
@@ -42,26 +62,6 @@ export default new TaskOfTasks('all', [
                 'fbw-a32nx/src/wasm/flypad-backend',
                 'fbw-common/src/wasm/fbw_common',
                 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/flypad-backend.wasm']),
-        ], true),
-
-        // Group all typescript and react build tasks together.
-        new TaskOfTasks('build', [
-            new ExecTask('model', 'npm run build-a32nx:model',['fbw-a32nx/src/model', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/model']),
-            new ExecTask('behavior', 'npm run build-a32nx:behavior', ['fbw-a32nx/src/behavior', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/ModelBehaviorDefs/A32NX/generated']),
-
-            new ExecTask('atsu','npm run build-a32nx:atsu', ['fbw-a32nx/src/systems/atsu', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/atsu']),
-            new ExecTask('failures','npm run build-a32nx:failures', ['fbw-a32nx/src/systems/failures', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/failures/failures.js']),
-            new ExecTask('fmgc','npm run build-a32nx:fmgc', ['fbw-a32nx/src/systems/fmgc', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/fmgc']),
-            new ExecTask('sentry-client','npm run build-a32nx:sentry-client', ['fbw-a32nx/src/systems/sentry-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/sentry-client']),
-            new ExecTask('simbridge-client', ['npm run build-a32nx:simbridge-client'], ['fbw-a32nx/src/systems/simbridge-client', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/simbridge-client']),
-            new ExecTask('tcas','npm run build-a32nx:tcas', ['fbw-a32nx/src/systems/tcas', 'fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/JS/tcas']),
-
-            new TaskOfTasks('instruments',
-                [
-                    ...getA32NXInstrumentsIgniterTasks(),
-                    new ExecTask('PFD', 'npm run build-a32nx:pfd', ['fbw-a32nx/src/systems/instruments/src/PFD','fbw-a32nx/out/flybywire-aircraft-a320-neo/html_ui/Pages/VCockpit/Instruments/A32NX/PFD'])
-                ],
-                true),
         ], true),
 
         // Create final package meta files.
