@@ -895,6 +895,8 @@ export abstract class BaseFlightPlan {
             segment.insertNecessaryDiscontinuities();
         }
 
+        this.incrementVersion();
+
         this.ensureNoDuplicates();
         this.adjustIFLegs();
 
