@@ -69,7 +69,7 @@ export class ApproachViaSegment extends FlightPlanSegment {
         const newSegment = new ApproachViaSegment(forPlan);
 
         newSegment.strung = this.strung;
-        newSegment.allLegs = [...this.allLegs];
+        newSegment.allLegs = [...this.allLegs.map((it) => (it.isDiscontinuity === false ? it.clone(newSegment) : it))];
         newSegment.approachVia = this.approachVia;
 
         return newSegment;

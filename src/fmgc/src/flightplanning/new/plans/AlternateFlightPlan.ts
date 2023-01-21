@@ -83,7 +83,7 @@ export class AlternateOriginSegment extends OriginSegment {
         const newSegment = new AlternateOriginSegment(forPlan, this.mainDestinationSegment);
 
         newSegment.strung = this.strung;
-        newSegment.allLegs = [...this.allLegs];
+        newSegment.allLegs = [...this.allLegs.map((it) => (it.isDiscontinuity === false ? it.clone(newSegment) : it))];
         newSegment.airport = this.airport;
         newSegment.runway = this.runway;
 

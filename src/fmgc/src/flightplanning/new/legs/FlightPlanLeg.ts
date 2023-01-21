@@ -19,6 +19,7 @@ import { MagVar } from '@shared/MagVar';
 export interface SerializedFlightPlanLeg {
     isDiscontinuity: false,
     definition: FlightPlanLegDefinition,
+    effectiveType: LegType,
 }
 
 export enum FlightPlanLegFlags {
@@ -48,11 +49,19 @@ export class FlightPlanLeg {
     isDiscontinuity: false = false
 
     serialize(): SerializedFlightPlanLeg {
-        return { isDiscontinuity: false, definition: this.definition };
+        return { isDiscontinuity: false, definition: this.definition, effectiveType: this.type };
+    }
+
+    clone(forSegment: FlightPlanSegment): FlightPlanLeg {
+        return FlightPlanLeg.deserialize(this.serialize(), forSegment);
     }
 
     static deserialize(serialized: SerializedFlightPlanLeg, segment: FlightPlanSegment): FlightPlanLeg {
-        return FlightPlanLeg.fromProcedureLeg(segment, serialized.definition, serialized.definition.procedureIdent);
+        const leg = FlightPlanLeg.fromProcedureLeg(segment, serialized.definition, serialized.definition.procedureIdent);
+
+        leg.type = serialized.effectiveType;
+
+        return leg;
     }
 
     get waypointDescriptor() {

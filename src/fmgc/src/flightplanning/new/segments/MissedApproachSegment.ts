@@ -24,7 +24,7 @@ export class MissedApproachSegment extends FlightPlanSegment {
         const newSegment = new MissedApproachSegment(forPlan);
 
         newSegment.strung = this.strung;
-        newSegment.allLegs = [...this.allLegs];
+        newSegment.allLegs = [...this.allLegs.map((it) => (it.isDiscontinuity === false ? it.clone(newSegment) : it))];
 
         return newSegment;
     }

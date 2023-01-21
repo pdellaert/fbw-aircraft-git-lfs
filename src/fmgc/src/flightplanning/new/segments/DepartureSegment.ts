@@ -66,7 +66,7 @@ export class DepartureSegment extends FlightPlanSegment {
         const newSegment = new DepartureSegment(forPlan);
 
         newSegment.strung = this.strung;
-        newSegment.allLegs = [...this.allLegs];
+        newSegment.allLegs = [...this.allLegs.map((it) => (it.isDiscontinuity === false ? it.clone(newSegment) : it))];
         newSegment.originDeparture = this.originDeparture;
 
         return newSegment;
