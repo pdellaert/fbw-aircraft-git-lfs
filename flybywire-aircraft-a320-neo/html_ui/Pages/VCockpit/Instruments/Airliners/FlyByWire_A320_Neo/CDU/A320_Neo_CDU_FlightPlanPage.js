@@ -244,7 +244,7 @@ class CDUFlightPlanPage {
                 if (!inAlternate && fpIndex === targetPlan.activeLegIndex) {
                     color = "white";
                 } else {
-                    const inMissedApproach = targetPlan.index === Fmgc.FlightPlanIndex.Active && fpIndex >= targetPlan.firstMissedApproachLeg;
+                    const inMissedApproach = targetPlan.index === Fmgc.FlightPlanIndex.Active && fpIndex >= targetPlan.firstMissedApproachLegIndex;
 
                     if (inMissedApproach || inAlternate) {
                         color = 'cyan';

@@ -315,7 +315,7 @@ function doGenerateTransitionsForLeg(leg: Leg, legIndex: number, plan: BaseFligh
     }
 
     if (leg.metadata.isInMissedApproach) {
-        return legIndex <= plan.firstMissedApproachLeg;
+        return legIndex <= plan.firstMissedApproachLegIndex;
     }
 
     return true;

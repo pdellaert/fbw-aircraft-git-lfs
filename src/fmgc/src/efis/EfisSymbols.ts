@@ -443,7 +443,7 @@ export class EfisSymbols {
         const planCentreIndex = SimVar.GetSimVarValue('L:A32NX_SELECTED_WAYPOINT_INDEX', 'number');
 
         const correctPlanOnMcdu = activeOrTemporary ? planCentreFpIndex === FlightPlanIndex.Active : planCentreFpIndex === flightPlan.index;
-        const transmitMissed = correctPlanOnMcdu && flightPlan.firstMissedApproachLeg - planCentreIndex < 4;
+        const transmitMissed = correctPlanOnMcdu && flightPlan.firstMissedApproachLegIndex - planCentreIndex < 4;
 
         const ret: NdSymbol[] = [];
 
@@ -520,7 +520,7 @@ export class EfisSymbols {
                 direction = leg.definition.magneticCourse; // TODO true
             }
 
-            if (i >= flightPlan.firstMissedApproachLeg && !transmitMissed) {
+            if (i >= flightPlan.firstMissedApproachLegIndex && !transmitMissed) {
                 continue;
             }
 

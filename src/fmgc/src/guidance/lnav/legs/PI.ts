@@ -14,7 +14,7 @@ import { DebugPointColour, PathVector, PathVectorType } from '@fmgc/guidance/lna
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { SegmentType } from '@fmgc/wtsdk';
 import { bearingTo, distanceTo, placeBearingDistance, smallCircleGreatCircleIntersection } from 'msfs-geo';
-import { TurnDirection, Waypoint } from 'msfs-navdata';
+import { Fix, TurnDirection, Waypoint } from 'msfs-navdata';
 import { MathUtils } from '@shared/MathUtils';
 
 interface Segment {
@@ -52,7 +52,7 @@ export class PILeg extends Leg {
     private debugPoints: PathVector[] = [];
 
     constructor(
-        public fix: Waypoint,
+        public fix: Fix,
         private nextLeg: CFLeg,
         public metadata: LegMetadata,
         public segment: SegmentType,

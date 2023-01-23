@@ -14,6 +14,8 @@ export class EnrouteSegment extends FlightPlanSegment {
 
     allLegs: FlightPlanElement[] = []
 
+    isSequencedMissedApproach = false
+
     insertLeg(leg: FlightPlanLeg) {
         this.allLegs.push(leg);
     }

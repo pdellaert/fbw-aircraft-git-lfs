@@ -155,7 +155,7 @@ export class EfisVectors {
 
         // ACTIVE missed
 
-        const missedApproachInView = plan.firstMissedApproachLeg - planCentreIndex < 4;
+        const missedApproachInView = plan.firstMissedApproachLegIndex - planCentreIndex < 4;
         const transmitMissed = planIsBeingScrolledInto && !planCentreInAlternate && missedApproachInView;
 
         if (transmitMissed) {
@@ -184,7 +184,7 @@ export class EfisVectors {
 
                 // ALTN missed
 
-                const altnMissedApproachInView = plan.alternateFlightPlan.firstMissedApproachLeg - planCentreIndex < 4;
+                const altnMissedApproachInView = plan.alternateFlightPlan.firstMissedApproachLegIndex - planCentreIndex < 4;
                 const transmitAlternateMissed = planIsBeingScrolledInto && planCentreInAlternate && altnMissedApproachInView;
 
                 if (transmitAlternateMissed) {

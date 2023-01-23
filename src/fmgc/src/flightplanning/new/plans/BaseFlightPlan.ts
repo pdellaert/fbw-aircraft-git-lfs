@@ -111,9 +111,46 @@ export abstract class BaseFlightPlan {
     }
 
     sequence() {
-        this.activeLegIndex++;
+        if (this.activeLegIndex + 1 >= this.firstMissedApproachLegIndex) {
+            this.enrouteSegment.allLegs.length = 0;
 
-        this.sendEvent('flightPlan.setActiveLegIndex', { planIndex: this.index, forAlternate: false, activeLegIndex: this.activeLegIndex });
+            const missedApproachPointLeg = this.approachSegment.allLegs[this.approachSegment.allLegs.length - 1];
+            const cloneMissedApproachPointLeg = missedApproachPointLeg.isDiscontinuity === false ? missedApproachPointLeg.clone(this.enrouteSegment) : missedApproachPointLeg;
+            const clonedMissedApproachLegs = this.missedApproachSegment.allLegs.map((it) => (it.isDiscontinuity === false ? it.clone(this.enrouteSegment) : it));
+
+            if (cloneMissedApproachPointLeg.isDiscontinuity === false) {
+                cloneMissedApproachPointLeg.type = LegType.IF;
+
+                this.enrouteSegment.allLegs.push(cloneMissedApproachPointLeg);
+            }
+            this.enrouteSegment.allLegs.push(...clonedMissedApproachLegs);
+            this.enrouteSegment.allLegs.push({ isDiscontinuity: true });
+            this.enrouteSegment.strung = true;
+            this.enrouteSegment.isSequencedMissedApproach = true;
+
+            this.syncSegmentLegsChange(this.enrouteSegment);
+
+            // We don't have to await any of this because of how we use it, but this might be something to clean up in the future
+
+            this.arrivalEnrouteTransitionSegment.setArrivalEnrouteTransition(undefined);
+            this.arrivalSegment.setArrivalProcedure(undefined);
+
+            this.approachSegment.setApproachProcedure(this.approachSegment.approachProcedure?.ident);
+            this.approachViaSegment.setApproachVia(this.approachViaSegment.approachViaProcedure?.ident);
+
+            this.enqueueOperation(FlightPlanQueuedOperation.Restring);
+            this.flushOperationQueue();
+
+            const activeIndex = this.allLegs.findIndex((it) => it === clonedMissedApproachLegs[0]);
+
+            this.activeLegIndex = activeIndex;
+
+            this.sendEvent('flightPlan.setActiveLegIndex', { planIndex: this.index, forAlternate: this instanceof AlternateFlightPlan, activeLegIndex: activeIndex });
+        } else {
+            this.activeLegIndex++;
+
+            this.sendEvent('flightPlan.setActiveLegIndex', { planIndex: this.index, forAlternate: false, activeLegIndex: this.activeLegIndex });
+        }
     }
 
     version = 0;
@@ -1071,6 +1108,11 @@ export abstract class BaseFlightPlan {
 
                     // We can have duplicates in the missed approach
                     if (duplicateSegment === this.missedApproachSegment) {
+                        continue;
+                    }
+
+                    // We can have duplicates after an enroute which is a sequenced missed approach and another segment
+                    if (segment instanceof EnrouteSegment && segment.isSequencedMissedApproach) {
                         continue;
                     }
 
