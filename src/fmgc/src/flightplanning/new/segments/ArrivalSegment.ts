@@ -51,6 +51,7 @@ export class ArrivalSegment extends FlightPlanSegment {
 
         this.arrival = matchingArrival;
         this.allLegs.length = 0;
+        this.strung = false;
 
         const mappedArrivalLegs = legs.map((leg) => FlightPlanLeg.fromProcedureLeg(this, leg, matchingArrival.ident));
         this.allLegs.push(...mappedArrivalLegs);
