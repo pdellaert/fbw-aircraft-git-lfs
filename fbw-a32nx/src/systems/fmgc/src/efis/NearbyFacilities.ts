@@ -1,6 +1,7 @@
 // Copyright (c) 2021 FlyByWire Simulations
 // SPDX-License-Identifier: GPL-3.0
 
+import { UpdateThrottler } from '@shared/UpdateThrottler';
 import { Coordinates } from 'msfs-geo';
 import { NearestSearchType } from '../types/fstypes/FSEnums';
 
@@ -33,9 +34,7 @@ export class NearbyFacilities {
 
     private ppos = { lat: 0, long: 0 };
 
-    private pposValid = false;
-
-    private throttler = new A32NX_Util.UpdateThrottler(10000);
+    private throttler = new UpdateThrottler(10000);
 
     private radius = 381 * 1852; // metres
 
@@ -43,11 +42,11 @@ export class NearbyFacilities {
 
     private constructor() {
         this.listener = RegisterViewListener('JS_LISTENER_FACILITY', async () => {
-            this.listener.on('SendAirport', this.addAirport.bind(this));
-            this.listener.on('SendIntersection', this.addWaypoint.bind(this));
-            this.listener.on('SendNdb', this.addNdbNavaid.bind(this));
-            this.listener.on('SendVor', this.addVhfNavaid.bind(this));
-            this.listener.on('NearestSearchCompleted', this.onSearchCompleted.bind(this));
+            this.listener.on('SendAirport', this.addAirport.bind(this), null);
+            this.listener.on('SendIntersection', this.addWaypoint.bind(this), null);
+            this.listener.on('SendNdb', this.addNdbNavaid.bind(this), null);
+            this.listener.on('SendVor', this.addVhfNavaid.bind(this), null);
+            this.listener.on('NearestSearchCompleted', this.onSearchCompleted.bind(this), null);
 
             this.airportSessionId = await Coherent.call('START_NEAREST_SEARCH_SESSION', NearestSearchType.Airport);
             this.ndbSessionId = await Coherent.call('START_NEAREST_SEARCH_SESSION', NearestSearchType.Ndb);
