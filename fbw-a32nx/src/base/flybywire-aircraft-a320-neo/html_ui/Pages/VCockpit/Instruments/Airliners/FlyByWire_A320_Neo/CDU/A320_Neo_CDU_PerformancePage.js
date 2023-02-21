@@ -654,6 +654,9 @@ class CDUPerformancePage {
     static ShowAPPRPage(mcdu) {
         mcdu.clearDisplay();
         mcdu.page.Current = mcdu.page.PerformancePageAppr;
+
+        const plan = mcdu.flightPlanService.active;
+
         CDUPerformancePage._timer = 0;
         CDUPerformancePage._lastPhase = mcdu.flightPhaseManager.phase;
         mcdu.pageUpdate = () => {
@@ -665,7 +668,7 @@ class CDUPerformancePage {
             }
         };
 
-        const closeToDest = mcdu.flightPlanManager.getDestination() && mcdu.flightPlanManager.getDestination().liveDistanceTo <= 180;
+        const closeToDest = plan.destinationAirport && 0 <= 180; // TODO port over (fms-v2)
 
         let qnhCell = "[\xa0\xa0][color]cyan";
         if (isFinite(mcdu.perfApprQNH)) {
@@ -717,11 +720,15 @@ class CDUPerformancePage {
         };
 
         let transAltCell = "\xa0".repeat(5);
-        const hasDestination = !!mcdu.flightPlanManager.getDestination();
+        const hasDestination = !!plan.destinationAirport;
+
         if (hasDestination) {
-            if (mcdu.flightPlanManager.destinationTransitionLevel !== undefined) {
-                transAltCell = (mcdu.flightPlanManager.destinationTransitionLevel * 100).toFixed(0).padEnd(5, "\xa0");
-                if (mcdu.flightPlanManager.destinationTransitionLevelIsFromDb) {
+            const transitionLevel = plan.performanceData.transitionLevel.get();
+
+            if (transitionLevel !== undefined) {
+                transAltCell = (transitionLevel * 100).toFixed(0).padEnd(5, "\xa0");
+
+                if (plan.performanceData.transitionLevelIsFromDatabase.get()) {
                     transAltCell = `{small}${transAltCell}{end}`;
                 }
             } else {
@@ -776,8 +783,8 @@ class CDUPerformancePage {
             }
         };
 
-        const approach = mcdu.flightPlanManager.getApproach();
-        const isILS = approach && approach.approachType === ApproachType.APPROACH_TYPE_ILS;
+        const approach = plan.approach;
+        const isILS = approach && approach.type === 5;
         let radioLabel = "";
         let radioCell = "";
         if (isILS) {
