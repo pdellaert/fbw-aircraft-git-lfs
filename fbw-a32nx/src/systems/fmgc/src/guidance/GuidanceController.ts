@@ -18,7 +18,7 @@ import { HMLeg } from '@fmgc/guidance/lnav/legs/HX';
 import { SimVarString } from '@shared/simvar';
 import { getFlightPhaseManager } from '@fmgc/flightphase';
 import { FmgcFlightPhase } from '@shared/flightphase';
-import { ApproachType } from 'msfs-navdata';
+import { ApproachType, LegType } from 'msfs-navdata';
 import { NavigationDatabase } from '@fmgc/NavigationDatabase';
 import { BaseFlightPlan } from '@fmgc/flightplanning/new/plans/BaseFlightPlan';
 import { LnavDriver } from './lnav/LnavDriver';
@@ -259,11 +259,20 @@ export class GuidanceController {
         this.pseudoWaypoints.init();
 
         Coherent.on('A32NX_IMM_EXIT', (fpIndex, immExit) => {
-            const leg = this.activeGeometry.legs.get(fpIndex);
+            const fpLeg = FlightPlanService.active.maybeElementAt(fpIndex);
+            const geometryLeg = this.activeGeometry.legs.get(fpIndex);
+
             const tas = SimVar.GetSimVarValue('AIRSPEED TRUE', 'Knots');
-            if (leg instanceof HMLeg) {
-                leg.setImmediateExit(immExit, this.lnavDriver.ppos, tas);
+
+            if (fpLeg.isDiscontinuity === false && fpLeg.type === LegType.HM) {
+                fpLeg.holdImmExit = immExit;
+
                 FlightPlanService.active.incrementVersion();
+            }
+
+            if (geometryLeg instanceof HMLeg) {
+                geometryLeg.setImmediateExit(immExit, this.lnavDriver.ppos, tas);
+
                 this.automaticSequencing = true;
             }
         }, undefined);
