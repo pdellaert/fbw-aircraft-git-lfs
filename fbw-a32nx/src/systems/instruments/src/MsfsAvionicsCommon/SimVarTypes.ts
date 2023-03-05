@@ -11,15 +11,11 @@ export interface AdirsSimVars {
     pitch: number;
     roll: number;
     magHeadingRaw: number;
-    heading: number;
-    trueHeading: number;
     baroCorrectedAltitude: number;
     speed: number;
     vsInert: number;
     vsBaro: number;
-    groundTrack: number;
     magTrackRaw: number;
-    trueGroundTrack: number;
     groundSpeed: number;
     trueAirSpeed: number;
     windDirection: number;
@@ -60,12 +56,12 @@ export enum AdirsVars {
 export const AdirsSimVarDefinitions = new Map<keyof AdirsSimVars, SimVarDefinition>([
     ['pitch', { name: AdirsVars.pitch, type: SimVarValueType.Number }],
     ['roll', { name: AdirsVars.roll, type: SimVarValueType.Number }],
-    ['heading', { name: AdirsVars.heading, type: SimVarValueType.Number }],
-    ['trueHeading', { name: AdirsVars.trueHeading, type: SimVarValueType.Number }],
+    ['magHeadingRaw', { name: AdirsVars.heading, type: SimVarValueType.Number }],
+    ['trueHeadingRaw', { name: AdirsVars.trueHeading, type: SimVarValueType.Number }],
     ['baroCorrectedAltitude', { name: AdirsVars.baroCorrectedAltitude1, type: SimVarValueType.Number }],
     ['speed', { name: AdirsVars.speed, type: SimVarValueType.Number }],
-    ['groundTrack', { name: AdirsVars.groundTrack, type: SimVarValueType.Number }],
-    ['trueGroundTrack', { name: AdirsVars.trueGroundTrack, type: SimVarValueType.Number }],
+    ['magTrackRaw', { name: AdirsVars.trueGroundTrack, type: SimVarValueType.Number }],
+    ['trueTrackRaw', { name: AdirsVars.groundTrack, type: SimVarValueType.Number }],
     ['groundSpeed', { name: AdirsVars.groundSpeed, type: SimVarValueType.Number }],
     ['trueAirSpeed', { name: AdirsVars.trueAirSpeed, type: SimVarValueType.Number }],
     ['windDirection', { name: AdirsVars.windDirection, type: SimVarValueType.Number }],
