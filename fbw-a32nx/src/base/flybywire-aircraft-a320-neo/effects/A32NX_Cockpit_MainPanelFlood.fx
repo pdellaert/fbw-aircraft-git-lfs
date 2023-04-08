@@ -52,8 +52,8 @@ Face=1, 1, 1
 [ParticleAttributes.0]
 Blend Mode=2
 Bounce=0.00
-Color Start=255, 140, 100, 0
-Color End=255, 140, 100, 0
+Color Start=255, 173, 94, 1
+Color End=255, 173, 94, 1
 Jitter Distance=0.00
 Jitter Time=0.00
 uv1=0.00, 0.00
@@ -67,11 +67,11 @@ Extrude Heading Max=0.00
 
 [LightAttributes.0]
 Type=spot
-Size=0.1
-Range=2
-Intensity=2
+Size=0.001
+Range=0.480
+Intensity=10.0
 Softness=0.0
-SpotInner=10.0
-SpotOuter=20.0
+SpotInner=0
+SpotOuter=66.2
 Volumetric=0
-ScatDir=0.0
+ScatDir=0
