@@ -7,9 +7,9 @@ import React, { useEffect, useState } from 'react';
 import { CloudArrowDown, ShieldLock } from 'react-bootstrap-icons';
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode.react';
-import { usePersistentProperty } from '@flybywiresim/fbw-sdk';
+import { NavigraphClient, usePersistentProperty } from '@flybywiresim/fbw-sdk';
 import { t } from '../../../translation';
-import NavigraphClient, { useNavigraph } from '../Navigraph';
+import { useNavigraph } from '../Navigraph';
 
 const Loading = () => {
     const navigraph = useNavigraph();
