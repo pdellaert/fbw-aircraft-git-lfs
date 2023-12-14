@@ -6,8 +6,6 @@
 <!--  1. [Changed Area] Title of changes - @github username (Name)  -->
 
 ## 0.12.0
-1. [GENERAL] Added C++ WASM framework and migrated all flypad-backend code to it - @frankkopp (Frank Kopp)
-
 1. [EFB/ATSU] Added NOAA (aviationweather.gov) as a METAR source - @tracernz (Mike)
 1. [EFB] Fixed the main page and landing calculator to use the selected METAR source - @tracernz (Mike)
 1. [FMS] Improve layout of PERF CLB, PERF CRZ and PERF DES pages according to H3 - @BlueberryKing (BlueberryKing)
@@ -32,6 +30,7 @@
 1. [MODEL] Replaced overhead decals - @Repsol2k
 1. [MODEL] General improvements to 3d model and textures - @MoreRightRudder, @Repsol2k, @tracernz
 1. [MODEL] Folding armrests - @Repsol2k
+1. [GENERAL] Added C++ WASM framework and migrated all flypad-backend code to it - @frankkopp (Frank Kopp)
 
 ## 0.11.0
 
